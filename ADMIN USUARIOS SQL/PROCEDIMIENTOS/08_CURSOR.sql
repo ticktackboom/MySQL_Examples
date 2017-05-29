@@ -39,11 +39,28 @@ BEGIN
     OPEN mi_cursor;
     
     miBucle:LOOP
-		FETCH mi_cursor INTO vprod, vtot;
+    	/* El bucle va a ir leyendo el resultado de del cursor línea por línea (fila por fila).
+	Cada vez que llamemos a FETCH, leerá la siguiente fila y volcará sus valores en las variables
+	que hemos declarado. */
+	FETCH mi_cursor INTO vprod, vtot;
+	
+	/*
+		Si durante el FETCH ocurre que no quedan más filas por leer, se producirá un error.
+		Al producirse un error, la variable "fin" se pondrá a TRUE porque estaba siendo manejada por el HANDLER.
+		Ahora, si "fin" es TRUE, significa que el FETCH ha dado error, no ha devuelto una nueva fila, y por tanto,
+		hay que cerrar el bucle.
+	*/
+	
         IF fin = TRUE THEN
-				LEAVE miBucle;
-		END IF;
+		LEAVE miBucle;
+	END IF;
+	
+	/*
+		Si no he salido del bucle, inserto los datos que acabo de leer en la nueva tabla.
+	*/
+	
         INSERT INTO MAS_VENDIDOS_PROD values(vprod, vtot);
+	
 	END LOOP miBucle;
     
     /* Cerramos el cursor para liberar memoria */
